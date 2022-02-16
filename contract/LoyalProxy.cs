@@ -127,7 +127,7 @@ namespace loyal
 
         public static bool PerformTransfer(UInt160 tokenAsset, UInt160 recevier, BigInteger amount)
         {
-            var fulfilParam = new object[] { Runtime.ExecutingScriptHash, recevier, recevier };
+            var fulfilParam = new object[] { Runtime.ExecutingScriptHash, recevier, amount };
             bool fulfilSuccess1 = (bool)Contract.Call(tokenAsset, "transfer", CallFlags.All, fulfilParam);
             Assert(fulfilSuccess1, "lock: Failed to transfer token from user to the contract.");
             return true;
