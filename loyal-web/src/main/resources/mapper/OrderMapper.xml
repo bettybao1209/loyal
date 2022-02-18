@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.neo.loyaldemo.mapper.OrderMapper">
+
+    <resultMap id="OrderMap" type="org.neo.loyaldemo.pojo.OrderBook">
+        <result column="order_id" property="orderId" />
+        <result column="user_address" property="userAddress" />
+        <result column="from_asset_address" property="fromAssetAddress" />
+        <result column="to_asset_address" property="toAssetAddress" />
+        <result column="amount" property="amount" />
+        <result column="create_time" property="createTime" />
+        <result column="fulfiled_amount" property="fulfiledAmount"/>
+    </resultMap>
+
+    <select id="selectOrderByAddress" resultMap="OrderMap" parameterType="string">
+        select
+            order_id, user_address, from_asset_address, to_asset_address, amount, create_time, fulfiled_amount
+        from
+            order_book
+        where
+            user_address = #{address}
+    </select>
+
+    <update id="updateOrderStatus">
+        update
+        order_book
+        set status = 2
+        where order_id=#{orderId}
+    </update>
+
+    <insert id="batchInsertOrders" parameterType="java.util.List">
+        insert into
+        order_book(order_id, user_address, from_asset_address, to_asset_address, amount, tx_hash, create_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            ( #{item.orderId}, #{item.userAddress}, #{item.fromAssetAddress}, #{item.toAssetAddress}, #{item.amount}, #{item.txHash}, #{item.createTime})
+        </foreach>
+    </insert>
+
+    <insert id="updateOrderAmount" parameterType="java.util.List">
+        insert into order_book(
+        order_id, amount, fulfiled_amount
+        )VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.orderId}, #{item.amount}, #{item.fulfiledAmount})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+        fulfiled_amount = VALUES(fulfiled_amount) + fulfiled_amount
+
+    </insert>
+
+    <insert id="batchInsertRecords" parameterType="java.util.List">
+        insert into
+        fulfil_record(order_id_from, order_id_to, amount, create_time, tx_hash)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            ( #{item.orderIdFrom}, #{item.orderIdTo}, #{item.amount}, #{item.createTime}, #{item.txHash})
+        </foreach>
+
+    </insert>
+
+    <select id="selectBlockHeight" resultType="java.lang.Long">
+        select
+        block_index
+        from
+        block_status
+        order by id desc limit 1
+    </select>
+
+    <insert id="insertBlock" >
+        insert into
+        block_status(block_index)
+        values
+        (#{blockIndex})
+        ON DUPLICATE KEY UPDATE
+        block_index = values(block_index)
+    </insert>
+
+</mapper>
