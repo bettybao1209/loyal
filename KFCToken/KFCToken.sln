@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32002.261
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KFCToken", "KFCToken.csproj", "{F7612DFD-2A6B-4FFD-BC28-38A1FA71D742}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F7612DFD-2A6B-4FFD-BC28-38A1FA71D742}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7612DFD-2A6B-4FFD-BC28-38A1FA71D742}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7612DFD-2A6B-4FFD-BC28-38A1FA71D742}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7612DFD-2A6B-4FFD-BC28-38A1FA71D742}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {03848554-B092-4D7D-9A4E-DD35C4F663F4}
+	EndGlobalSection
+EndGlobal
