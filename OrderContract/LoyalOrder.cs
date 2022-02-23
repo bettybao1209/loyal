@@ -132,6 +132,7 @@ namespace LoyalOrder
                     PerformTransfer(toAssetHash, fromAddress, curAmount);
                     PerformTransfer(fromAssetHash, user, curAmount);
                     Orders.Delete(newKey);
+                    FulfilOrder(fromOrderId, toOrderId, curAmount);
                     if (amount > curAmount)
                     {
                         ByteString newValue = fromAddress + (ByteString)(amount - curAmount);
@@ -140,8 +141,8 @@ namespace LoyalOrder
                     else 
                     {
                         Orders.Delete(tokenKey);
+                        break;
                     }
-                    FulfilOrder(fromOrderId, toOrderId, curAmount);
                     amount -= curAmount;
                 }
                 else

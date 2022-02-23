@@ -64,6 +64,7 @@ public class OrderController {
         NeoSendRawTransaction tx = loyalContract.invokeFunction("order", ContractParameter.hash160(tokenA),
                         ContractParameter.hash160(tokenB), ContractParameter.hash160(userAccount.getScriptHash()), ContractParameter.integer(params.getAmount()))
                 .signers(AccountSigner.global(userAccount))
+                .additionalSystemFee(100_0000L)
                 .sign().send();
 
         if (tx.getResult() != null) {
