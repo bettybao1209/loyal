@@ -17,7 +17,7 @@ namespace LoyalOrder
     [ContractPermission("*", "transfer")]
     public class LoyalOrder : SmartContract
     {
-        private const byte Prefix_Order = 0x06;
+        private const byte Prefix_Order = 0x08;
         private const byte Prefix_OwnerAddress = 0x02;
         private const byte Prefix_TokenMap = 0x03;
         private const byte Prefix_OrderId = 0x05;
@@ -118,6 +118,9 @@ namespace LoyalOrder
             byte[] reverseTokenKey = Helper.Concat((byte[])toAssetHash, (byte[])fromAssetHash);
 
             var iterator = (Iterator<(ByteString, ByteString)>)Orders.Find(reverseTokenKey);
+            BigInteger transferToFrom = 0;
+            BigInteger amountClone = amount;
+
             foreach (var (key, value) in iterator)
             {
                 var newKey = ((byte[])key)[1..];
@@ -129,16 +132,11 @@ namespace LoyalOrder
                 BigInteger fromOrderId = new(tokenKey[40..]);
                 if (amount >= curAmount)
                 {
-                    PerformTransfer(toAssetHash, fromAddress, curAmount);
+                    transferToFrom += curAmount;
                     PerformTransfer(fromAssetHash, user, curAmount);
                     Orders.Delete(newKey);
                     FulfilOrder(fromOrderId, toOrderId, curAmount);
-                    if (amount > curAmount)
-                    {
-                        ByteString newValue = fromAddress + (ByteString)(amount - curAmount);
-                        Orders.Put(tokenKey, newValue);
-                    }
-                    else 
+                    if (amount == curAmount)
                     {
                         Orders.Delete(tokenKey);
                         break;
@@ -147,17 +145,22 @@ namespace LoyalOrder
                 }
                 else
                 {
-                    PerformTransfer(toAssetHash, fromAddress, amount);
+                    transferToFrom += amount;
                     PerformTransfer(fromAssetHash, user, amount);
                     ByteString newValue = user + (ByteString)(curAmount - amount);
                     Orders.Put(newKey, newValue);
                     Orders.Delete(tokenKey);
                     FulfilOrder(fromOrderId, toOrderId, amount);
-                    amount -= curAmount;
                     break;
                 }
             }
-            
+
+            PerformTransfer(toAssetHash, fromAddress, transferToFrom);
+            if (transferToFrom < amountClone)
+            {
+                ByteString newValue = fromAddress + (ByteString)(amountClone - transferToFrom);
+                Orders.Put(tokenKey, newValue);
+            }
             return true;
         }
 
@@ -174,7 +177,7 @@ namespace LoyalOrder
             return true;
         }
 
-        public static bool PerformTransfer(UInt160 tokenAsset, UInt160 recevier, BigInteger amount)
+        private static bool PerformTransfer(UInt160 tokenAsset, UInt160 recevier, BigInteger amount)
         {
             var fulfilParam = new object[] { Runtime.ExecutingScriptHash, recevier, amount, null };
             bool fulfilSuccess = (bool)Contract.Call(tokenAsset, "transfer", CallFlags.All, fulfilParam);
